@@ -4,7 +4,10 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
+use App\Models\Uccx\AgentStat;
 use Illuminate\Console\Command;
+use App\Events\UccxDataUpdated;
 use GuzzleHttp\Exception\RequestException;
 
 class CallUccxApi extends Command
@@ -89,7 +92,7 @@ class CallUccxApi extends Command
             $agentStats = json_decode($json,TRUE);
             \Log::info('CallUccxApi: JSON decoded response body ($agentStats) is - ', [$agentStats]);
 
-            $labels = \Carbon\Carbon::now()->format('h:i');
+            $labels = Carbon::now()->format('h:i');
             \Log::info('CallUccxApi: Set chart labels - ', [$labels]);
 
             $agentStats['labels'] = $labels;
@@ -107,7 +110,7 @@ class CallUccxApi extends Command
                         'Authorization' => 'Bearer ' . env('TEAMS_BOT_TOKEN'),
                     ],
                     'verify' => false,
-                    \GuzzleHttp\RequestOptions::JSON => [
+                        RequestOptions::JSON => [
                         'toPersonEmail' => env('TEAMS_NOTIFY_ADDRESS'),
                         'text' => 'Heads up!  There are no agents ready in the UCCX queue!'
                     ]
@@ -125,8 +128,6 @@ class CallUccxApi extends Command
         ]);
 
         \Log::info('CallUccxApi: Generating Websockets event to notify listening clients');
-        event(new \App\Events\UccxDataUpdated(
-            \App\Models\Uccx\AgentStat::getAgentStats()
-        ));
+        event(new UccxDataUpdated(AgentStat::getAgentStats()));
     }
 }
