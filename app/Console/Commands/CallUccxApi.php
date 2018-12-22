@@ -53,20 +53,17 @@ class CallUccxApi extends Command
 
         \Log::info('CallUccxApi: Checking application environment');
         if (\App::environment('local')) {
-
             \Log::info('CallUccxApi: App is in local/dev mode.  Generating dummy data');
             
-            $agentStats['ready'] = mt_rand(0,100);
-            $agentStats['notReady'] = mt_rand(0,100);
-            $agentStats['talking'] = mt_rand(0,100);
+            $agentStats['ready'] = mt_rand(0, 100);
+            $agentStats['notReady'] = mt_rand(0, 100);
+            $agentStats['talking'] = mt_rand(0, 100);
             $agentStats['loggedIn'] = $agentStats['ready'] + $agentStats['notReady'] + $agentStats['talking'];
             $labels = Carbon::now()->format('h:i');
             $agentStats['labels'] = $labels;
 
             \Log::info('CallUccxApi: App is in local/dev mode.  Dummy data is ready', $agentStats);
-
         } else {
-
             \Log::info('CallUccxApi: App is NOT in local/dev mode.  Calling UCCX API now');
 
             try {
@@ -89,7 +86,7 @@ class CallUccxApi extends Command
             $json = json_encode($xml);
             \Log::info('CallUccxApi: JSON encoded response body is - ', [$json]);
 
-            $agentStats = json_decode($json,TRUE);
+            $agentStats = json_decode($json, true);
             \Log::info('CallUccxApi: JSON decoded response body ($agentStats) is - ', [$agentStats]);
 
             $labels = Carbon::now()->format('h:i');
@@ -100,8 +97,7 @@ class CallUccxApi extends Command
         }
 
         \Log::info('CallUccxApi: checking if ready agents == 0');
-        if($agentStats['ready'] == 0) {
-
+        if ($agentStats['ready'] == 0) {
             \Log::info('CallUccxApi: Ready agents does == 0.  Posting notice to Teams Room');
 
             try {
@@ -118,7 +114,6 @@ class CallUccxApi extends Command
             } catch (RequestException $e) {
                 \Log::error('CallUccxApi: Received an error when posting to the Webex Teams room - ', [$e->getMessage()]);
             }
-            
         }
 
         \Log::info('CallUccxApi: Storing local model statistics in DB');
