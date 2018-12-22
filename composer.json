@@ -12,6 +12,7 @@
         "beyondcode/laravel-websockets": "^1.0",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.7.*",
+        "laravel/telescope": "^1.0",
         "laravel/tinker": "^1.0",
         "pusher/pusher-php-server": "~3.0"
     },
